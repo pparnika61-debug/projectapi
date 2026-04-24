@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>API Result</title>
+
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+    padding: 40px;
+    background: #f3f4f6;
+}
+
+h1 { margin-bottom: 20px; }
+
+.status {
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: white;
+    display: inline-block;
+}
+
+.allowed { background: green; }
+.blocked { background: red; }
+
+.warning {
+    color: orange;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+pre {
+    background: #eee;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: left;
+}
+</style>
+</head>
+
+<body>
+
+<h1>{{ api }}</h1>
+
+<p><b>User:</b> {{ username }}</p>
+<p><b>Tier:</b> {{ tier }}</p>
+<p><b>Time:</b> {{ time }}</p>
+
+{% if status == "Allowed" %}
+    <div class="status allowed">Allowed</div>
+{% else %}
+    <div class="status blocked">Blocked</div>
+{% endif %}
+
+{% if anomaly %}
+    <p class="warning">⚠️ High usage detected (Anomaly)</p>
+{% endif %}
+
+{% if status == "Allowed" %}
+    <p><b>Remaining:</b> {{ remaining }}</p>
+    <pre>{{ data }}</pre>
+{% else %}
+    <p><b>Retry After:</b> {{ retry_after }} sec</p>
+{% endif %}
+
+<br>
+<a href="/dashboard">⬅ Back</a>
+
+</body>
+</html>

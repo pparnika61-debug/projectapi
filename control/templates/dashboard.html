@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f0f4f8;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+
+        .tier {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .free { background: #dbeafe; color: #1e40af; }
+        .premium { background: #fde68a; color: #92400e; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        th, td {
+            padding: 15px;
+        }
+
+        th {
+            background: #3b82f6;
+            color: #ffffff;
+        }
+
+        tr:nth-child(even) {
+            background: #f7f9fc;
+        }
+
+        tr:hover {
+            background: #e0f2ff;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: #10b981;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>API Usage Dashboard</h2>
+
+    <div class="user-info">
+        Logged in as: <b>{{ username }}</b> |
+        Tier:
+        <span class="tier {{ tier }}">{{ tier }}</span> |
+        <a href="/logout">Logout</a>
+    </div>
+
+    <table>
+        <tr>
+            <th>API Name</th>
+            <th>Limit/min</th>
+            <th>Used</th>
+            <th>Remaining</th>
+            <th>Action</th>
+        </tr>
+
+        {% for api in api_data %}
+        <tr>
+            <td>{{ api.name }}</td>
+            <td>{{ api.limit }}</td>
+            <td>{{ api.used }}</td>
+            <td>{{ api.remaining }}</td>
+            <td>
+                <a href="/call/{{ api.name }}"><button>Call</button></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+</body>
+</html>

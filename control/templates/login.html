@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign In</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .container {
+            width: 350px;
+            padding: 35px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .brand {
+            font-size: 18px;
+            font-weight: 600;
+            color: #4facfe;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 8px rgba(79, 172, 254, 0.4);
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4facfe, #00c6ff);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 13px;
+            margin-top: -8px;
+            margin-bottom: 15px;
+            color: #4facfe;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .footer-text {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        a {
+            color: #0077ff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Error message */
+        .error {
+            background: #ffe0e0;
+            color: #cc0000;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .modal h3 {
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .modal p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .modal input {
+            margin-bottom: 10px;
+        }
+
+        .modal-close {
+            margin-top: 10px;
+            background: #eee;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .modal-close:hover {
+            background: #ddd;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .success-msg {
+            background: #e0ffe0;
+            color: #007700;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="brand">🚀 API Rate Limiter</div>
+    <h2>Sign In</h2>
+    <p class="subtitle">Access your account to monitor API usage</p>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+
+        <a class="forgot-link" onclick="openModal()">Forgot Password?</a>
+
+        <button type="submit">Sign In</button>
+    </form>
+
+    <p class="footer-text">
+        Don't have an account? <a href="/sign_up">Sign Up</a>
+    </p>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h3>🔑 Reset Password</h3>
+        <p>Enter your username and new password below.</p>
+
+        <div class="success-msg" id="successMsg">✅ Password reset successful! Please login.</div>
+
+        <input type="text" id="resetUsername" placeholder="Username">
+        <input type="password" id="newPassword" placeholder="New Password">
+        <input type="password" id="confirmPassword" placeholder="Confirm New Password">
+
+        <button onclick="resetPassword()">Reset Password</button>
+        <button class="modal-close" onclick="closeModal()">Cancel</button>
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById("modalOverlay").classList.add("active");
+    }
+
+    function closeModal() {
+        document.getElementById("modalOverlay").classList.remove("active");
+        document.getElementById("resetUsername").value = "";
+        document.getElementById("newPassword").value = "";
+        document.getElementById("confirmPassword").value = "";
+        document.getElementById("successMsg").style.display = "none";
+    }
+
+    async function resetPassword() {
+        const username = document.getElementById("resetUsername").value.trim();
+        const newPassword = document.getElementById("newPassword").value.trim();
+        const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+        if (!username || !newPassword || !confirmPassword) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        const response = await fetch("/reset_password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, new_password: newPassword })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            document.getElementById("successMsg").style.display = "block";
+            setTimeout(closeModal, 2000);
+        } else {
+            alert(result.message || "User not found. Please sign up first.");
+        }
+    }
+</script>
+
+</body>
+</html>
