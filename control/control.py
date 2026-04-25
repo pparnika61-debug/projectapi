@@ -110,9 +110,10 @@ def dashboard():
         previous = get_previous_window_usage(api_name, TIME_WINDOW, username)
         anomaly = detect_anomaly(used, previous)
 
-        # If API is blocked (used >= limit), show 0 for clean display
+        # If API is blocked, show 0 for used count but 100% red for progress bar
         display_used = used if used < limit else 0
-        usage_pct = min(int((display_used / limit) * 100), 100) if limit > 0 else 0
+        is_blocked = used >= limit
+        usage_pct = 100 if is_blocked else (min(int((used / limit) * 100), 100) if limit > 0 else 0)
 
         api_data.append({
             "name": api_name,
@@ -122,6 +123,7 @@ def dashboard():
             "previous": previous,
             "anomaly": anomaly,
             "usage_pct": usage_pct,
+            "is_blocked": is_blocked,
         })
 
     return render_template(
