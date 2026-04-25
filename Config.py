@@ -13,7 +13,6 @@ API_LIMITS = {
     "Delete Account": 3
 }
 
-# Plan multipliers
 TIER_LIMITS = {
     "free": 1,
     "monthly": 2,

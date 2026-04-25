@@ -3,69 +3,366 @@
 <head>
 <meta charset="UTF-8">
 <title>API Result</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-    font-family: Arial;
-    text-align: center;
-    padding: 40px;
-    background: #f3f4f6;
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #0ea5e9, #6366f1);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
 }
 
-h1 { margin-bottom: 20px; }
+@keyframes gradientBG {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
-.status {
-    padding: 10px 20px;
+.card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    overflow: hidden;
+}
+
+/* Card Header */
+.card-header {
+    padding: 24px 28px 18px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.api-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 10px;
+}
+
+.meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: #6b7280;
+    align-items: center;
+}
+
+.tier-badge {
+    padding: 3px 12px;
     border-radius: 20px;
-    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.free    { background: #dbeafe; color: #1e40af; }
+.monthly { background: #fde68a; color: #92400e; }
+.yearly  { background: #d1fae5; color: #065f46; }
+
+/* Status */
+.status-section {
+    padding: 20px 28px;
+    text-align: center;
+}
+
+.status-pill {
     display: inline-block;
+    padding: 10px 30px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
 }
 
-.allowed { background: green; }
-.blocked { background: red; }
+.allowed { background: #dcfce7; color: #15803d; border: 2px solid #86efac; }
+.blocked { background: #fee2e2; color: #b91c1c; border: 2px solid #fca5a5; }
 
-.warning {
-    color: orange;
-    font-weight: bold;
-    margin-top: 10px;
+/* Anomaly Box */
+.anomaly-box {
+    background: #fff7ed;
+    border: 1.5px solid #fcd34d;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 0 28px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
 }
 
-pre {
-    background: #eee;
-    padding: 10px;
+.anomaly-icon { font-size: 20px; flex-shrink: 0; }
+
+.anomaly-text { font-size: 13px; color: #92400e; }
+.anomaly-text b { display: block; font-size: 14px; margin-bottom: 3px; color: #b45309; }
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 28px 20px;
+}
+
+.stat-box {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e3a8a;
+}
+
+.stat-value.green { color: #16a34a; }
+.stat-value.red   { color: #dc2626; }
+
+/* Data Response */
+.data-section {
+    padding: 0 28px 20px;
+}
+
+.data-label {
+    font-size: 12px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.data-box {
+    background: #f0f7ff;
+    border: 1px solid #bfdbfe;
     border-radius: 10px;
-    text-align: left;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #1e40af;
+    font-family: monospace;
 }
+
+/* Timer */
+.timer-section {
+    padding: 0 28px 20px;
+    text-align: center;
+}
+
+.timer-display {
+    font-size: 64px;
+    font-weight: 700;
+    color: #dc2626;
+    line-height: 1;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+.timer-label {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* Progress bar */
+.usage-bar-wrap {
+    padding: 0 28px 20px;
+}
+
+.usage-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.usage-bar {
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.usage-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+    transition: width 0.5s ease;
+}
+
+/* Footer Button */
+.card-footer {
+    padding: 0 28px 28px;
+}
+
+.back-btn {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: opacity 0.2s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.back-btn:hover { opacity: 0.88; }
 </style>
 </head>
 
 <body>
+<div class="card">
 
-<h1>{{ api }}</h1>
+    <!-- Header -->
+    <div class="card-header">
+        <div class="api-name">📡 {{ api }}</div>
+        <div class="meta">
+            👤 <b>{{ username }}</b>
+            <span class="tier-badge {{ tier }}">
+                {% if tier == 'free' %}🆓 Free
+                {% elif tier == 'monthly' %}⭐ Monthly
+                {% elif tier == 'yearly' %}👑 Yearly
+                {% else %}{{ tier }}{% endif %}
+            </span>
+        </div>
+    </div>
 
-<p><b>User:</b> {{ username }}</p>
-<p><b>Tier:</b> {{ tier }}</p>
-<p><b>Time:</b> {{ time }}</p>
+    <!-- Status -->
+    <div class="status-section">
+        {% if status == "Allowed" %}
+            <div class="status-pill allowed">✅ Request Allowed</div>
+        {% else %}
+            <div class="status-pill blocked">🚫 Request Blocked</div>
+        {% endif %}
+    </div>
 
-{% if status == "Allowed" %}
-    <div class="status allowed">Allowed</div>
-{% else %}
-    <div class="status blocked">Blocked</div>
+    <!-- Anomaly Box -->
+    {% if anomaly %}
+    <div class="anomaly-box">
+        <div class="anomaly-icon">⚠️</div>
+        <div class="anomaly-text">
+            <b>Anomaly Detected</b>
+            Unusual spike in request pattern detected for this API.
+            Previous window: <b>{{ previous }}</b> calls →
+            Current window: <b>{{ used }}</b> calls.
+        </div>
+    </div>
+    {% endif %}
+
+    {% if status == "Allowed" %}
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-label">Used This Minute</div>
+            <div class="stat-value">{{ used }}</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Remaining</div>
+            <div class="stat-value green">{{ remaining }}</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Your Limit</div>
+            <div class="stat-value">{{ limit }}</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Previous Window</div>
+            <div class="stat-value">{{ previous }}</div>
+        </div>
+    </div>
+
+    <!-- Usage Bar -->
+    <div class="usage-bar-wrap">
+        <div class="usage-bar-label">
+            <span>Usage</span>
+            <span>{{ used }}/{{ limit }}</span>
+        </div>
+        <div class="usage-bar">
+            <div class="usage-fill" style="width: {{ [((used / limit) * 100)|int, 100]|min }}%"></div>
+        </div>
+    </div>
+
+    <!-- API Response -->
+    <div class="data-section">
+        <div class="data-label">API Response</div>
+        <div class="data-box">{{ data }}</div>
+    </div>
+
+    {% else %}
+
+    <!-- Timer -->
+    <div class="timer-section">
+        <div class="timer-display" id="timer">1:00</div>
+        <div class="timer-label">⏳ Cooldown Time Remaining</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-label">Requests Used</div>
+            <div class="stat-value red">{{ used }}</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Your Limit</div>
+            <div class="stat-value">{{ limit }}</div>
+        </div>
+    </div>
+
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="card-footer">
+        <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+    </div>
+
+</div>
+
+{% if status != "Allowed" %}
+<script>
+    let time = {{ retry_after }};
+    const display = document.getElementById("timer");
+
+    function formatTime(s) {
+        let m = Math.floor(s / 60);
+        let sec = s % 60;
+        return m + ":" + String(sec).padStart(2, "0");
+    }
+
+    display.textContent = formatTime(time);
+
+    let interval = setInterval(() => {
+        time--;
+        display.textContent = formatTime(time);
+        if (time <= 0) {
+            clearInterval(interval);
+            display.textContent = "0:00";
+        }
+    }, 1000);
+</script>
 {% endif %}
-
-{% if anomaly %}
-    <p class="warning">⚠️ High usage detected (Anomaly)</p>
-{% endif %}
-
-{% if status == "Allowed" %}
-    <p><b>Remaining:</b> {{ remaining }}</p>
-    <pre>{{ data }}</pre>
-{% else %}
-    <p><b>Retry After:</b> {{ retry_after }} sec</p>
-{% endif %}
-
-<br>
-<a href="/dashboard">⬅ Back</a>
 
 </body>
 </html>
