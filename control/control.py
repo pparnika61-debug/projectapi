@@ -18,7 +18,7 @@ controllers = Blueprint("controllers", __name__, template_folder="../templates")
 # ============================================================
 def detect_anomaly(current, previous):
     if previous == 0:
-        return current >= 5          # Cold start: flag if suddenly 5+ calls
+        return current >= 5
     ratio = current / previous
     spike = (current - previous) >= 10
     return ratio >= 3 or spike
@@ -110,7 +110,6 @@ def dashboard():
         previous = get_previous_window_usage(api_name, TIME_WINDOW, username)
         anomaly = detect_anomaly(used, previous)
 
-        # Usage percentage for progress bar
         usage_pct = min(int((used / limit) * 100), 100) if limit > 0 else 0
 
         api_data.append({
@@ -146,12 +145,8 @@ def call_api(api_name):
     base_limit = API_LIMITS.get(api_name, 5)
     dynamic_limit = base_limit * multiplier
 
-    # Current window usage
     used = get_api_usage(api_name, TIME_WINDOW, username)
-
-    # Previous window usage (for anomaly comparison)
     previous = get_previous_window_usage(api_name, TIME_WINDOW, username)
-
     anomaly = detect_anomaly(used, previous)
 
     if used < dynamic_limit:
@@ -172,7 +167,6 @@ def call_api(api_name):
         )
 
     else:
-        # Accurate retry timer based on oldest request in window
         earliest = get_earliest_request_time(api_name, TIME_WINDOW, username)
 
         if earliest:
@@ -194,6 +188,31 @@ def call_api(api_name):
             limit=dynamic_limit,
             previous=previous
         )
+
+
+# ============================================================
+# 🧹 RESET DATABASE — clears all API request logs
+# Visit /reset_db to clear stuck blocked states on Render
+# ============================================================
+@controllers.route("/reset_db")
+def reset_db():
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM api_requests")
+    conn.commit()
+    conn.close()
+    return """
+    <div style='font-family:Poppins,sans-serif; text-align:center; margin-top:100px;'>
+        <h2 style='color:#16a34a;'>✅ Database Cleared!</h2>
+        <p style='color:#6b7280; margin:10px 0;'>All API request logs have been deleted.</p>
+        <a href='/dashboard' style='
+            display:inline-block; margin-top:20px;
+            padding:10px 24px; background:#3b82f6;
+            color:white; border-radius:10px;
+            text-decoration:none; font-weight:600;
+        '>Go to Dashboard →</a>
+    </div>
+    """
 
 
 # ============================================================
