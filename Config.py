@@ -15,6 +15,6 @@ API_LIMITS = {
 
 TIER_LIMITS = {
     "free": 1,
-    "monthly": 100,
-    "yearly": 1000
+    "monthly": 2,
+    "yearly": 3
 }
