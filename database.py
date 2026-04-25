@@ -91,16 +91,11 @@ def log_api_call(api_name, username):
 def get_api_usage(api_name, window, username):
     conn = connect()
     cursor = conn.cursor()
-
-    # Fixed window — rounds down to nearest minute
-    now = datetime.now()
-    window_start = now.replace(second=0, microsecond=0)
-
+    cutoff = (datetime.now() - timedelta(seconds=window)).strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute("""
     SELECT COUNT(*) FROM api_requests
     WHERE api_name=? AND username=? AND timestamp>=?
-    """, (api_name, username, window_start.strftime("%Y-%m-%d %H:%M:%S")))
-
+    """, (api_name, username, cutoff))
     count = cursor.fetchone()[0]
     conn.close()
     return count

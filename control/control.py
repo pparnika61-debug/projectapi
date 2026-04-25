@@ -110,13 +110,15 @@ def dashboard():
         previous = get_previous_window_usage(api_name, TIME_WINDOW, username)
         anomaly = detect_anomaly(used, previous)
 
-        usage_pct = min(int((used / limit) * 100), 100) if limit > 0 else 0
+        # If API is blocked (used >= limit), show 0 for clean display
+        display_used = used if used < limit else 0
+        usage_pct = min(int((display_used / limit) * 100), 100) if limit > 0 else 0
 
         api_data.append({
             "name": api_name,
             "limit": limit,
-            "used": used,
-            "remaining": max(limit - used, 0),
+            "used": display_used,
+            "remaining": max(limit - display_used, 0),
             "previous": previous,
             "anomaly": anomaly,
             "usage_pct": usage_pct,
@@ -184,7 +186,7 @@ def call_api(api_name):
             username=username,
             tier=tier,
             anomaly=True,
-            used=used,
+            used=0,
             limit=dynamic_limit,
             previous=previous
         )
