@@ -12,7 +12,7 @@ from api_res import get_api_specific_response
 controllers = Blueprint("controllers", __name__, template_folder="../templates")
 
 
-# 🔥 ANOMALY DETECTION
+# ---------------- ANOMALY ----------------
 def detect_anomaly(current, previous):
     if previous == 0:
         return current >= 5
@@ -65,6 +65,9 @@ def plans():
 # ---------------- SELECT PLAN ----------------
 @controllers.route("/select_plan/<plan>")
 def select_plan(plan):
+    if not session.get("username"):
+        return redirect(url_for("controllers.login"))
+
     username = session["username"]
 
     conn = connect()
@@ -79,6 +82,9 @@ def select_plan(plan):
 # ---------------- DASHBOARD ----------------
 @controllers.route("/dashboard")
 def dashboard():
+    if not session.get("username"):
+        return redirect(url_for("controllers.login"))
+
     username = session["username"]
 
     tier = get_user_tier(username)
@@ -90,19 +96,18 @@ def dashboard():
         limit = base_limit * multiplier
         used = get_api_usage(api_name, TIME_WINDOW, username)
 
-        # 🔥 CLEAN RESET FIX
-        if used >= limit:
-            display_used = 0
-        elif used == 0:
-            display_used = 0
-        else:
-            display_used = used
+        # your original display logic
+        display_used = 0 if used >= limit else used
+
+        # 🔥 ONLY FIX (IMPORTANT)
+        usage_pct = int((used / limit) * 100) if limit > 0 else 0
 
         api_data.append({
             "name": api_name,
             "limit": limit,
             "used": display_used,
-            "remaining": max(limit - display_used, 0)
+            "remaining": max(limit - display_used, 0),
+            "usage_pct": usage_pct   # used only for color
         })
 
     return render_template(
@@ -116,12 +121,15 @@ def dashboard():
 # ---------------- API CALL ----------------
 @controllers.route("/call/<api_name>")
 def call_api(api_name):
+    if not session.get("username"):
+        return redirect(url_for("controllers.login"))
+
     username = session["username"]
 
     tier = get_user_tier(username)
     multiplier = TIER_LIMITS.get(tier, 1)
 
-    base_limit = API_LIMITS.get(api_name)
+    base_limit = API_LIMITS.get(api_name, 5)
     dynamic_limit = base_limit * multiplier
 
     used = get_api_usage(api_name, TIME_WINDOW, username)
@@ -152,7 +160,6 @@ def call_api(api_name):
         if earliest:
             earliest_time = datetime.strptime(earliest, "%Y-%m-%d %H:%M:%S")
             expire_time = earliest_time + timedelta(seconds=TIME_WINDOW)
-
             retry_after = int(max((expire_time - datetime.now()).total_seconds(), 0))
         else:
             retry_after = TIME_WINDOW
