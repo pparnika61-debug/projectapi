@@ -94,20 +94,40 @@ def dashboard():
 
     for api_name, base_limit in API_LIMITS.items():
         limit = base_limit * multiplier
+
+        # Real usage within current time window
         used = get_api_usage(api_name, TIME_WINDOW, username)
+        previous = get_previous_window_usage(api_name, TIME_WINDOW, username)
 
-        # your original display logic
-        display_used = 0 if used >= limit else used
+        # Cap display at limit
+        display_used = min(used, limit)
 
-        # 🔥 ONLY FIX (IMPORTANT)
-        usage_pct = int((used / limit) * 100) if limit > 0 else 0
+        # Remaining calls
+        remaining = max(limit - used, 0)
+
+        # Percentage for color (capped at 100)
+        usage_pct = min(int((used / limit) * 100), 100) if limit > 0 else 0
+
+        # Anomaly detection
+        anomaly = detect_anomaly(used, previous)
+
+        # Reset countdown if blocked
+        reset_in = None
+        if used >= limit:
+            earliest = get_earliest_request_time(api_name, TIME_WINDOW, username)
+            if earliest:
+                earliest_time = datetime.strptime(earliest, "%Y-%m-%d %H:%M:%S")
+                expire_time = earliest_time + timedelta(seconds=TIME_WINDOW)
+                reset_in = int(max((expire_time - datetime.now()).total_seconds(), 0))
 
         api_data.append({
             "name": api_name,
             "limit": limit,
             "used": display_used,
-            "remaining": max(limit - display_used, 0),
-            "usage_pct": usage_pct   # used only for color
+            "remaining": remaining,
+            "usage_pct": usage_pct,
+            "anomaly": anomaly,
+            "reset_in": reset_in  # seconds until reset, None if not blocked
         })
 
     return render_template(
@@ -149,7 +169,7 @@ def call_api(api_name):
             username=username,
             tier=tier,
             anomaly=anomaly,
-            used=used,
+            used=used + 1,
             limit=dynamic_limit,
             previous=previous
         )
