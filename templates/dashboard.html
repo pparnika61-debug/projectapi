@@ -240,3 +240,23 @@
 
 </body>
 </html>
+<script>
+    let refreshNeeded = false;
+    let minTime = 999999;
+
+    {% for api in api_data %}
+        {% if api.reset_in %}
+            refreshNeeded = true;
+            if ({{ api.reset_in }} < minTime) {
+                minTime = {{ api.reset_in }};
+            }
+        {% endif %}
+    {% endfor %}
+
+    // Auto refresh when timer ends
+    if (refreshNeeded) {
+        setTimeout(() => {
+            location.reload();
+        }, (minTime + 1) * 1000);
+    }
+</script>

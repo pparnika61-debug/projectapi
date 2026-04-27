@@ -90,12 +90,28 @@ def log_api_call(api_name, username):
 def get_api_usage(api_name, window, username):
     conn = connect()
     cursor = conn.cursor()
-    cutoff = (datetime.now() - timedelta(seconds=window)).strftime("%Y-%m-%d %H:%M:%S")
-    cursor.execute("""
-    SELECT COUNT(*) FROM api_requests
-    WHERE api_name=? AND username=? AND timestamp>=?
-    """, (api_name, username, cutoff))
-    count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT timestamp FROM api_requests WHERE api_name=? AND username=? ORDER BY timestamp ASC", (api_name, username))
+    rows = cursor.fetchall()
+
+    now = datetime.now()
+    active_window_start = None
+    count = 0
+
+    for row in rows:
+        req_time = datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S")
+        if active_window_start is None:
+            active_window_start = req_time
+            count = 1
+        elif (req_time - active_window_start).total_seconds() < window:
+            count += 1
+        else:
+            active_window_start = req_time
+            count = 1
+
+    if active_window_start is not None and (now - active_window_start).total_seconds() >= window:
+        count = 0
+
     conn.close()
     return count
 
@@ -117,14 +133,26 @@ def get_previous_window_usage(api_name, window, username):
 def get_earliest_request_time(api_name, window, username):
     conn = connect()
     cursor = conn.cursor()
-    cutoff = (datetime.now() - timedelta(seconds=window)).strftime("%Y-%m-%d %H:%M:%S")
-    cursor.execute("""
-    SELECT MIN(timestamp) FROM api_requests
-    WHERE api_name=? AND username=? AND timestamp>=?
-    """, (api_name, username, cutoff))
-    result = cursor.fetchone()[0]
+
+    cursor.execute("SELECT timestamp FROM api_requests WHERE api_name=? AND username=? ORDER BY timestamp ASC", (api_name, username))
+    rows = cursor.fetchall()
+
+    now = datetime.now()
+    active_window_start = None
+
+    for row in rows:
+        req_time = datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S")
+        if active_window_start is None:
+            active_window_start = req_time
+        elif (req_time - active_window_start).total_seconds() >= window:
+            active_window_start = req_time
+
+    if active_window_start is not None and (now - active_window_start).total_seconds() < window:
+        conn.close()
+        return active_window_start.strftime("%Y-%m-%d %H:%M:%S")
+
     conn.close()
-    return result
+    return None
 
 def get_all_users_usage_summary(api_name, window):
     """Gets per-user usage for admin anomaly overview"""

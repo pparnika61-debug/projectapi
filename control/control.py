@@ -118,7 +118,7 @@ def dashboard():
             if earliest:
                 earliest_time = datetime.strptime(earliest, "%Y-%m-%d %H:%M:%S")
                 expire_time = earliest_time + timedelta(seconds=TIME_WINDOW)
-                reset_in = int(max((expire_time - datetime.now()).total_seconds(), 0))
+                reset_in = int(max((expire_time - datetime.now()).total_seconds(), 0)) + 1
 
         api_data.append({
             "name": api_name,
@@ -180,7 +180,7 @@ def call_api(api_name):
         if earliest:
             earliest_time = datetime.strptime(earliest, "%Y-%m-%d %H:%M:%S")
             expire_time = earliest_time + timedelta(seconds=TIME_WINDOW)
-            retry_after = int(max((expire_time - datetime.now()).total_seconds(), 0))
+            retry_after = int(max((expire_time - datetime.now()).total_seconds(), 0)) + 1
         else:
             retry_after = TIME_WINDOW
 
